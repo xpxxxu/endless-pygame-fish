@@ -1,4 +1,3 @@
-# endless-pygame-fish
 # Endless Procedural Fish Simulation (24/7 Stream)
 
 A continuous, endless simulation built entirely in Python using Pygame. The fish swims, eats, and grows endlessly in a procedurally generated environment.
