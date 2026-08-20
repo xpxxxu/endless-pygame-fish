@@ -3,7 +3,7 @@ import pygame
 import random
 import numpy as np
 
-# 1. تهيئة اللعبة والصوت
+
 pygame.init()
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.mixer.init()
@@ -16,34 +16,31 @@ clock = pygame.time.Clock()
 pygame.font.init()
 font = pygame.font.SysFont('tahoma', 36, bold=True)
 
-# --- نظام توليد الموسيقى البسيطة (النغمات) ---
-# الترددات الأساسية لبعض النوتات الموسيقية (مقياس خماسي - Pentatonic Scale - لضمان تناغم الأصوات)
+
 PENTATONIC_FREQS = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25]
 
 def generate_tone(frequency, duration=1.5, volume=0.1, sample_rate=44100):
     t = np.linspace(0, duration, int(sample_rate * duration), False)
     
-    # توليد الموجة الصوتية الأساسية
+
     wave = np.sin(2 * np.pi * frequency * t)
     
-    # إضافة تلاشي للصوت (Fade out) ليكون مثل الجرس
+    
     envelope = np.exp(-3.0 * t / duration) 
     wave = wave * envelope
     
-    # تحجيم الصوت
+  
     audio_array = np.int16(wave * 32767 * volume)
     
-    # تحويله لمسارين (Stereo)
+   
     stereo_array = np.column_stack((audio_array, audio_array))
     
     return pygame.sndarray.make_sound(stereo_array)
 
-# حدث مؤقت لعزف النغمات
-MUSIC_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(MUSIC_EVENT, 1200) # عزف نغمة كل 1.2 ثانية
-# ---------------------------------------------
 
-# الألوان
+MUSIC_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(MUSIC_EVENT, 1200) 
+
 COLOR_WATER_TOP = (135, 206, 235)
 COLOR_WATER_BOTTOM = (10, 40, 70)
 COLOR_BUBBLE = (173, 216, 230)
@@ -163,14 +160,14 @@ while running:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
         
-        # عند إطلاق الحدث الزمني، قم بعزف نغمة عشوائية
+       
         if event.type == MUSIC_EVENT:
             try:
                 freq = random.choice(PENTATONIC_FREQS)
                 tone = generate_tone(freq, duration=2.0, volume=0.08)
                 tone.play()
             except Exception:
-                pass # تجاهل الأخطاء إذا حدثت لكي لا يتوقف البث
+                pass 
 
     target_x, target_y = food.x, food.y
 
