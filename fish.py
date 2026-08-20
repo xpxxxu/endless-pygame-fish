@@ -5,8 +5,9 @@ import numpy as np
 
 
 pygame.init()
-pygame.mixer.pre_init(44100, -16, 2, 512)
+pygame.mixer.pre_init(44100, -16, 2, 2048) 
 pygame.mixer.init()
+pygame.mixer.set_num_channels(16)
 
 WIDTH, HEIGHT = 1920, 1080
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -22,24 +23,31 @@ PENTATONIC_FREQS = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.
 def generate_tone(frequency, duration=1.5, volume=0.1, sample_rate=44100):
     t = np.linspace(0, duration, int(sample_rate * duration), False)
     
-
+    
     wave = np.sin(2 * np.pi * frequency * t)
     
-    
+
     envelope = np.exp(-3.0 * t / duration) 
     wave = wave * envelope
     
-  
+     
     audio_array = np.int16(wave * 32767 * volume)
     
-   
+    
     stereo_array = np.column_stack((audio_array, audio_array))
+    stereo_array = np.ascontiguousarray(stereo_array) 
     
     return pygame.sndarray.make_sound(stereo_array)
 
-
 MUSIC_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(MUSIC_EVENT, 1200) 
+pygame.time.set_timer(MUSIC_EVENT, 1200)  
+
+
+print("Generating and caching sounds...")
+sound_cache = {}
+for freq in PENTATONIC_FREQS:
+    sound_cache[freq] = generate_tone(freq, duration=2.0, volume=0.08)
+print("Sounds ready!")
 
 COLOR_WATER_TOP = (135, 206, 235)
 COLOR_WATER_BOTTOM = (10, 40, 70)
@@ -119,15 +127,19 @@ class Fish:
         self.original_image = create_fish_surface(self.scale)
         self.image = self.original_image
         self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.current_angle = 0 
 
     def grow(self):
         if self.scale < 2.0: 
             self.scale += 0.05
             self.original_image = create_fish_surface(self.scale)
+          
+            self.image = pygame.transform.rotate(self.original_image, self.current_angle)
             
     def reset_size(self):
         self.scale = 1.0
         self.original_image = create_fish_surface(self.scale)
+        self.image = pygame.transform.rotate(self.original_image, self.current_angle)
 
     def update(self, target_x, target_y):
         dx = target_x - self.x
@@ -139,7 +151,12 @@ class Fish:
             self.x += (dx / distance) * self.speed
             self.y += (dy / distance) * self.speed
 
-        self.image = pygame.transform.rotate(self.original_image, target_angle)
+        
+        target_angle = round(target_angle)
+        if self.current_angle != target_angle:
+            self.image = pygame.transform.rotate(self.original_image, target_angle)
+            self.current_angle = target_angle
+            
         self.rect = self.image.get_rect(center=(int(self.x), int(self.y)))
 
     def draw(self, surface):
@@ -160,12 +177,11 @@ while running:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
         
-       
+        
         if event.type == MUSIC_EVENT:
             try:
                 freq = random.choice(PENTATONIC_FREQS)
-                tone = generate_tone(freq, duration=2.0, volume=0.08)
-                tone.play()
+                sound_cache[freq].play()
             except Exception:
                 pass 
 
@@ -184,10 +200,6 @@ while running:
         fish.grow()
         food.spawn()
         
-        if score > 1000:
-            score = 0
-            fish.reset_size()
-
     screen.blit(background_gradient, (0, 0))
     for bubble in bubbles:
         bubble.draw(screen)
