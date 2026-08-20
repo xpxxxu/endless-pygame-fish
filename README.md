@@ -39,8 +39,8 @@ Features a smooth dynamic fish animation, generative pentatonic bell sounds, cus
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/musical-fish-stream.git](https://github.com/your-username/musical-fish-stream.git)
-   cd musical-fish-stream
+  git clone [https://github.com/xpxxxu/endless-pygame-fish.git](https://github.com/xpxxxu/endless-pygame-fish.git)
+cd endless-pygame-fish
 
 **Install dependencies:**
   ```bash
