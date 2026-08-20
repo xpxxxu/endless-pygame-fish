@@ -39,8 +39,7 @@ Features a smooth dynamic fish animation, generative pentatonic bell sounds, cus
 
 1. **Clone the repository:**
    ```bash
-  git clone [https://github.com/xpxxxu/endless-pygame-fish.git](https://github.com/xpxxxu/endless-pygame-fish.git)
-cd endless-pygame-fish
+   git clone [https://github.com/xpxxxu/endless-pygame-fish.git]
 
 **Install dependencies:**
   ```bash
